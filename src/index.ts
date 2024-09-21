@@ -170,7 +170,7 @@ export class Quark implements QuarkType {
 	generate() {
 		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n); // 0
 
-		this.sequence = // 0
+		this.sequence =
 			timestamp <= this.lastTimestamp
 				? extractNumRange(
 						this.sequence + 1n,
