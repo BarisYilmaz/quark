@@ -1,0 +1,36 @@
+{
+	"name": "quark",
+	"version": "1.0.0",
+	"description": "Quark Id",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"release": "pnpm run build && changeset publish",
+		"lint": "tsc"
+	},
+	"author": "barisyilmaz",
+	"license": "MIT",
+	"keywords": [
+		"quark",
+		"unique-id",
+		"unique-id-generation"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/BarisYilmaz/quark.git"
+	},
+	"engines": {
+		"node": ">=10.0.0"
+	},
+	"bugs": {
+		"url": "https://github.com/BarisYilmaz/quark/issues"
+	},
+	"homepage": "https://github.com/BarisYilmaz/quark",
+	"devDependencies": {
+		"@changesets/cli": "^2.27.8",
+		"tsup": "^8.3.0",
+		"typescript": "^5.6.2"
+	}
+}
