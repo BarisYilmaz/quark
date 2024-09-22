@@ -30,6 +30,7 @@
 	"homepage": "https://github.com/BarisYilmaz/quark",
 	"devDependencies": {
 		"@changesets/cli": "^2.27.8",
+		"ntp.js": "^1.1.0",
 		"tsup": "^8.3.0",
 		"typescript": "^5.6.2"
 	}

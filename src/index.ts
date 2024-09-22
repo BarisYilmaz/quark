@@ -1,3 +1,6 @@
+import { isPackageInstalled, isValidURL } from "./utils/node";
+import NTPClient, { NTP_EVENTS } from "ntp.js";
+
 type Allocations = {
 	/**
 	 * @type {number}
@@ -28,7 +31,24 @@ type QuarkOptions = {
 	 */
 	customAllocation?: Partial<Allocations>;
 
+	/**
+	 * @type {boolean}
+	 * @description Throw error if invalid arguments are passed
+	 */
 	throwError?: boolean;
+
+	/**
+	 * @type {object}
+	 * @description Time synchronization options for ntp.js
+	 */
+	timeSynchronization?: {
+		enabled?: boolean;
+		poolServerName?: string;
+		timeOffset?: number;
+		updateInterval?: number;
+		maxRetries?: number;
+		port?: number;
+	};
 };
 
 interface QuarkType {
@@ -94,6 +114,9 @@ export class Quark implements QuarkType {
 		sequence: 12,
 	};
 
+	private ntpClient: NTPClient | null = null;
+	timeDifference = 0;
+
 	constructor(
 		machineId: number,
 		epoch?: number,
@@ -136,6 +159,14 @@ export class Quark implements QuarkType {
 			};
 		}
 
+		if (options.timeSynchronization?.enabled) {
+			if (!isPackageInstalled("ntp.js")) {
+				console.warn("You must install ntp.js to use time synchronization");
+				if (options.throwError) throw new Error("You must install ntp.js to use time synchronization");
+				options.timeSynchronization.enabled = false;
+			}
+		}
+
 		this.machineId = options.machineId!;
 		this.lastTimestamp = -1n;
 		this.sequence = 0n;
@@ -165,18 +196,67 @@ export class Quark implements QuarkType {
 			this.allocations.machineId = 10;
 			this.allocations.sequence = 12;
 		}
+
+		if (options.timeSynchronization?.enabled) {
+			let poolServerName = options.timeSynchronization.poolServerName ?? "pool.ntp.org";
+
+			if (!isValidURL(poolServerName)) {
+				if (options.throwError) throw new Error("Invalid NTP pool server name");
+				poolServerName = "pool.ntp.org";
+			}
+
+			let timeOffset = options.timeSynchronization.timeOffset ?? 0;
+
+			if (timeOffset < -10000 || timeOffset > 10000) {
+				if (options.throwError) throw new Error("Time offset should be between -10 seconds and 10 seconds");
+				timeOffset = 0;
+			}
+
+			let updateInterval = options.timeSynchronization.updateInterval ?? 60000;
+
+			if (updateInterval < 1000 || updateInterval > 86400000) {
+				if (options.throwError) throw new Error("Update interval should be between 1 second and 24 hours");
+				updateInterval = 60000;
+			}
+
+			let maxRetries = options.timeSynchronization.maxRetries ?? 5;
+
+			if (maxRetries < 1 || maxRetries > 10) {
+				if (options.throwError) throw new Error("Max retries should be between 1 and 10");
+				maxRetries = 5;
+			}
+
+			this.ntpClient = new NTPClient({
+				poolServerName: poolServerName ?? "pool.ntp.org",
+				updateInterval: updateInterval ?? 60000,
+				maxRetries: maxRetries ?? 5,
+				port: options.timeSynchronization.port ?? 123,
+				timeOffset: timeOffset ?? 0,
+			});
+
+			this.ntpClient.on(NTP_EVENTS.SYNC, (time) => {
+				this.timeDifference = time - Date.now();
+			});
+
+			this.ntpClient.on(NTP_EVENTS.ERROR, (error) => {
+				if (options.throwError) throw new Error("Error synchronizing time");
+			});
+
+			this.ntpClient.begin();
+		}
 	}
 
 	generate() {
-		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n); // 0
+		const adjustedTime = Math.round(Date.now() + this.timeDifference);
+		let timestamp = bigIntMax(BigInt(adjustedTime) - this.epoch, 1n);
 
 		this.sequence =
 			timestamp <= this.lastTimestamp
 				? extractNumRange(
-						this.sequence + 1n,
-						0n,
-						BigInt(this.allocations.sequence)
-				  )
+					this.sequence + 1n,
+					0n,
+					BigInt(this.allocations.sequence)
+				)
 				: 0n;
 		if (!this.sequence)
 			timestamp = bigIntMax(timestamp, this.lastTimestamp + 1n);
