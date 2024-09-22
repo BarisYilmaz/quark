@@ -12,6 +12,17 @@
 		"moduleResolution": "Bundler",
 		"module": "ESNext",
 		"noEmit": true,
-		"lib": ["es2022", "dom", "dom.iterable"]
+		"lib": ["es2022"]
+	},
+	"ts-node": {
+		"compilerOptions": {
+			"module": "commonjs",
+			"verbatimModuleSyntax": false,
+			"allowJs": true,
+			"resolveJsonModule": true,
+			"moduleDetection": "force",
+			"noEmit": true,
+			"lib": ["es2022"]
+		}
 	}
 }
