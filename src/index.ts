@@ -106,7 +106,7 @@ export class Quark implements QuarkType {
 		c?: Omit<QuarkOptions, "machineId" | "epoch">
 	) {
 		let options: Partial<QuarkOptions> = {};
-		if (typeof a === "object") {
+		if (a != null && typeof a === "object") {
 			options = a;
 		} else if (
 			typeof a === "number" &&
@@ -119,12 +119,12 @@ export class Quark implements QuarkType {
 				customAllocation: {
 					machineId: 10,
 					sequence: 12,
-					...(options.customAllocation ?? {}),
+					...(c?.customAllocation ?? {}),
 				},
 			};
 		} else {
-			//if (Math.random() > 0.5)
-			if (options.throwError) throw new Error("Invalid arguments"); // This will never be reached, just to satisfy myself
+			// if (Math.random() > 0.5)
+			// if (options.throwError) throw new Error("Invalid arguments"); // This will never be reached, just to satisfy myself
 			options = {
 				machineId: 1,
 				epoch: 0,
@@ -136,7 +136,7 @@ export class Quark implements QuarkType {
 			};
 		}
 
-		this.machineId = options.machineId!;
+		this.machineId = Math.max(options.machineId!, 0);
 		this.lastTimestamp = -1n;
 		this.sequence = 0n;
 		this.epoch = BigInt(options.epoch ?? 0);
@@ -168,7 +168,7 @@ export class Quark implements QuarkType {
 	}
 
 	generate() {
-		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n); // 0
+		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n);
 
 		this.sequence =
 			timestamp <= this.lastTimestamp

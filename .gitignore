@@ -15,12 +15,10 @@ build/Release
 node_modules
 jspm_packages
 
-# Optional npm cache directory
-.npm
-
 # Other 
+.npm
 .DS_Store
 Thumbs.db
 ehthumbs.db
-
 dist
+/coverage
