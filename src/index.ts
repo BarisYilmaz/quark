@@ -167,7 +167,7 @@ export class Quark implements QuarkType {
 		}
 	}
 
-	generate() {
+	generate(): bigint {
 		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n);
 
 		this.sequence =
@@ -193,7 +193,11 @@ export class Quark implements QuarkType {
 		);
 	}
 
-	extract(quark: bigint) {
+	extract(quark: bigint): {
+		timestamp: number;
+		machineId: number;
+		sequence: number;
+	} {
 		return {
 			timestamp: this.extractTimestamp(quark),
 			machineId: this.extractMachineId(quark),
@@ -201,15 +205,15 @@ export class Quark implements QuarkType {
 		};
 	}
 
-	extractTimestamp(quark: bigint) {
+	extractTimestamp(quark: bigint): number {
 		return Number((quark >> 22n) + this.epoch);
 	}
 
-	extractDate(quark: bigint) {
+	extractDate(quark: bigint): Date {
 		return new Date(this.extractTimestamp(quark));
 	}
 
-	extractMachineId(quark: bigint) {
+	extractMachineId(quark: bigint): number {
 		return Number(
 			extractNumRange(
 				quark,
@@ -219,7 +223,7 @@ export class Quark implements QuarkType {
 		);
 	}
 
-	extractSequence(quark: bigint) {
+	extractSequence(quark: bigint): number {
 		return Number(
 			extractNumRange(quark, 0n, BigInt(this.allocations.sequence))
 		);
