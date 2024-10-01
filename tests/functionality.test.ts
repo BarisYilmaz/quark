@@ -1,4 +1,4 @@
-import { Quark } from "../src/index";
+import Quark from "../src/index";
 
 describe("Quark Functionality Tests", () => {
 	test("Machine ID of 0", () => {

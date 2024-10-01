@@ -1,4 +1,4 @@
-import { Quark } from "../src/index";
+import Quark from "../src/index";
 
 describe("Quark Constructor Tests", () => {
 	test("Default constructor behavior", () => {
