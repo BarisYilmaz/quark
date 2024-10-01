@@ -1,6 +1,6 @@
 {
 	"name": "quark",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Quark is a lightweight TypeScript library for generating and extracting unique, time-based identifiers similar to Twitter's Snowflake IDs. It provides a simple and efficient way to create distributed, sortable unique identifiers for your applications.",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
