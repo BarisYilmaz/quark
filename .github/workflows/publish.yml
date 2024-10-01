@@ -10,6 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
     contents: write
     pull-requests: write
+    id-token: write
 
 jobs:
     publish:
@@ -33,3 +34,5 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish to JSR
+              run: npx jsr publish

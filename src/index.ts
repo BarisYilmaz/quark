@@ -1,3 +1,22 @@
+/**
+ * @module quark
+ * @description A module for generating and extracting quark identifiers.
+ * 
+ * @example
+ * ```ts
+ * import Quark from "@hadron/quark";
+ * 
+ * const quark = new Quark(1);
+ * const id = quark.generate(); // 1405698163277568000
+ * const timestamp = quark.extractTimestamp(id); // 1714857363277
+ * const machineId = quark.extractMachineId(id); // 1
+ * const sequence = quark.extractSequence(id); // 0
+ * ```
+ */
+
+/**
+ * @description Bit allocation for machineId and sequence
+ */
 type Allocations = {
 	/**
 	 * @type {number}
@@ -11,6 +30,9 @@ type Allocations = {
 	sequence: number;
 };
 
+/**
+ * @description Options for the Quark class
+ */
 type QuarkOptions = {
 	/**
 	 * @type {number}
@@ -23,7 +45,7 @@ type QuarkOptions = {
 	 */
 	epoch?: number;
 	/**
-	 * @type {object}
+	 * @type {Partial<Allocations>}
 	 * @description Custom bit allocation
 	 */
 	customAllocation?: Partial<Allocations>;
@@ -31,60 +53,17 @@ type QuarkOptions = {
 	throwError?: boolean;
 };
 
-interface QuarkType {
-	/**
-	 * @description Generates a quark
-	 * @returns {bigint}
-	 */
-	generate(): bigint;
-
-	/**
-	 * @description Extracts timestamp, machineId and sequence from a quark
-	 * @param {bigint} quark
-	 * @returns {object}
-	 */
-	extract(quark: bigint): {
-		timestamp: number;
-		machineId: number;
-		sequence: number;
-	};
-
-	/**
-	 * @description Extracts timestamp from a quark
-	 * @param {bigint} quark
-	 * @returns {number}
-	 */
-	extractTimestamp(quark: bigint): number;
-
-	/**
-	 * @description Extracts date from a quark
-	 * @param {bigint} quark
-	 * @returns {Date}
-	 */
-	extractDate(quark: bigint): Date;
-
-	/**
-	 * @description Extracts machineId from a quark
-	 * @param {bigint} quark
-	 * @returns {number}
-	 */
-	extractMachineId(quark: bigint): number;
-
-	/**
-	 * @description Extracts sequence from a quark
-	 * @param {bigint} quark
-	 * @returns {number}
-	 */
-	extractSequence(quark: bigint): number;
-}
-
 const bigIntMax = (...args: bigint[]): bigint =>
 	args.reduce((prev, cur) => (cur > prev ? cur : prev));
 
 const extractNumRange = (num: bigint, start: bigint, end: bigint) =>
 	(num & ((1n << end) - 1n)) >> start;
 
-export class Quark implements QuarkType {
+/**
+ * @class Quark
+ * @description A class for generating and extracting quark identifiers.
+ */
+export default class Quark {
 	private machineId: number;
 	private lastTimestamp = -1n;
 	private sequence = 0n;
@@ -167,6 +146,10 @@ export class Quark implements QuarkType {
 		}
 	}
 
+	/**
+	 * @description Generates a quark
+	 * @returns {bigint}
+	 */
 	generate(): bigint {
 		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n);
 
@@ -193,6 +176,11 @@ export class Quark implements QuarkType {
 		);
 	}
 
+	/**
+	 * @description Extracts timestamp, machineId and sequence from a quark
+	 * @param {bigint} quark
+	 * @returns {timestamp: number, machineId: number, sequence: number}
+	 */
 	extract(quark: bigint): {
 		timestamp: number;
 		machineId: number;
@@ -205,14 +193,29 @@ export class Quark implements QuarkType {
 		};
 	}
 
+	/**
+	 * @description Extracts timestamp from a quark
+	 * @param {bigint} quark
+	 * @returns {number}
+	 */
 	extractTimestamp(quark: bigint): number {
 		return Number((quark >> 22n) + this.epoch);
 	}
 
+	/**
+	 * @description Extracts date from a quark
+	 * @param {bigint} quark
+	 * @returns {Date}
+	 */
 	extractDate(quark: bigint): Date {
 		return new Date(this.extractTimestamp(quark));
 	}
 
+	/**
+	 * @description Extracts machineId from a quark
+	 * @param {bigint} quark
+	 * @returns {number}
+	 */
 	extractMachineId(quark: bigint): number {
 		return Number(
 			extractNumRange(
@@ -223,6 +226,11 @@ export class Quark implements QuarkType {
 		);
 	}
 
+	/**
+	 * @description Extracts sequence from a quark
+	 * @param {bigint} quark
+	 * @returns {number}
+	 */
 	extractSequence(quark: bigint): number {
 		return Number(
 			extractNumRange(quark, 0n, BigInt(this.allocations.sequence))

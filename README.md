@@ -14,10 +14,22 @@ Quark is a lightweight TypeScript library for generating and extracting unique, 
 
 ## Installation
 
+## NPM
+
 ```bash
 npm install quark
 pnpm install quark
 yarn add quark
+```
+
+## JSR
+
+```bash
+deno add jsr:@hadron/quark
+npx jsr add @hadron/quark
+pnpm dlx jsr add @hadron/quark
+yarn dlx jsr add @hadron/quark
+bunx jsr add @hadron/quark
 ```
 
 ## Usage

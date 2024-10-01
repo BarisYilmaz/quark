@@ -4,11 +4,12 @@
 	"exports": "./src/index.ts",
 	"publish": {
 		"exclude": [
-			"!src/**/*",
-			"!jsr.json",
+			"*",
+			".*",
+			"!src",
 			"!CHANGELOG.md",
-			"!README.md",
-			"!LICENSE"
+			"!LICENSE",
+			"!README.md"
 		]
 	}
 }
