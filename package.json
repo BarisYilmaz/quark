@@ -1,5 +1,5 @@
 {
-	"name": "quark",
+	"name": "@thehadron/quark",
 	"version": "1.0.1",
 	"description": "Quark is a lightweight TypeScript library for generating and extracting unique, time-based identifiers similar to Twitter's Snowflake IDs. It provides a simple and efficient way to create distributed, sortable unique identifiers for your applications.",
 	"main": "dist/index.js",
@@ -20,7 +20,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/BarisYilmaz/quark.git"
+		"url": "git+https://github.com/BarisYilmaz/quark.git"
 	},
 	"engines": {
 		"node": ">=10.0.0"
@@ -36,5 +36,8 @@
 		"ts-jest": "^29.2.5",
 		"tsup": "^8.3.0",
 		"typescript": "^5.6.2"
+	},
+	"directories": {
+		"test": "tests"
 	}
 }

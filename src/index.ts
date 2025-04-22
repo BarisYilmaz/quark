@@ -1,17 +1,30 @@
 /**
  * @module quark
  * @description A module for generating and extracting quark identifiers.
- * 
- * @example
+ *
+ * @example Basic Usage
  * ```ts
- * import Quark from "@hadron/quark";
- * 
+ * import { Quark } from "@hadron/quark";
+ *
  * const quark = new Quark(1);
  * const id = quark.generate(); // 1405698163277568000
  * const timestamp = quark.extractTimestamp(id); // 1714857363277
  * const machineId = quark.extractMachineId(id); // 1
  * const sequence = quark.extractSequence(id); // 0
  * ```
+ *
+ * @example Custom Epoch and Bit Allocation
+ * You can set a custom epoch (in milliseconds) and customize bit allocation:
+ * ```ts
+ * const customEpoch = 1704067200000; // January 1, 2024
+ * const quark = new Quark({
+ *		machineId: 1,
+ *		epoch: customEpoch,
+ *		customAllocation: {
+ *			machineId: 8,
+ *			sequence: 14,
+ * 		},
+ * });
  */
 
 /**
@@ -63,7 +76,7 @@ const extractNumRange = (num: bigint, start: bigint, end: bigint) =>
  * @class Quark
  * @description A class for generating and extracting quark identifiers.
  */
-export default class Quark {
+export class Quark {
 	private machineId: number;
 	private lastTimestamp = -1n;
 	private sequence = 0n;
@@ -148,7 +161,7 @@ export default class Quark {
 
 	/**
 	 * @description Generates a quark
-	 * @returns {bigint}
+	 * @returns {bigint} A freshly generated Quark Identifier
 	 */
 	generate(): bigint {
 		let timestamp = bigIntMax(BigInt(Date.now()) - this.epoch, 1n);
@@ -179,7 +192,7 @@ export default class Quark {
 	/**
 	 * @description Extracts timestamp, machineId and sequence from a quark
 	 * @param {bigint} quark
-	 * @returns {timestamp: number, machineId: number, sequence: number}
+	 * @returns {object} An object containing timestamp, machineId and sequence of the quark
 	 */
 	extract(quark: bigint): {
 		timestamp: number;
@@ -196,7 +209,7 @@ export default class Quark {
 	/**
 	 * @description Extracts timestamp from a quark
 	 * @param {bigint} quark
-	 * @returns {number}
+	 * @returns {number} Timestamp of the quark
 	 */
 	extractTimestamp(quark: bigint): number {
 		return Number((quark >> 22n) + this.epoch);
@@ -205,7 +218,7 @@ export default class Quark {
 	/**
 	 * @description Extracts date from a quark
 	 * @param {bigint} quark
-	 * @returns {Date}
+	 * @returns {Date} The generation date of the quark
 	 */
 	extractDate(quark: bigint): Date {
 		return new Date(this.extractTimestamp(quark));
@@ -214,7 +227,7 @@ export default class Quark {
 	/**
 	 * @description Extracts machineId from a quark
 	 * @param {bigint} quark
-	 * @returns {number}
+	 * @returns {number} Machine Id used to generate the quark
 	 */
 	extractMachineId(quark: bigint): number {
 		return Number(
@@ -229,7 +242,7 @@ export default class Quark {
 	/**
 	 * @description Extracts sequence from a quark
 	 * @param {bigint} quark
-	 * @returns {number}
+	 * @returns {number} Sequence of the quark
 	 */
 	extractSequence(quark: bigint): number {
 		return Number(
